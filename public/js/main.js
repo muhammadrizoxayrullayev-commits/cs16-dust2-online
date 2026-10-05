@@ -3,7 +3,7 @@ import { GameEngine } from './game.js';
 import { CS_WEAPONS } from './economy.js';
 import { CSConsole } from './console.js';
 
-window.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   const canvas = document.getElementById('game-canvas');
   const network = new NetworkClient();
   let game = null;
@@ -38,19 +38,35 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 1. INSTANT START (WITH BOTS) - No waiting, no blocking!
+  function startPlayNow() {
+    const name = playerNameInput ? (playerNameInput.value.trim() || 'CS_Player') : 'CS_Player';
+    if (connectModal) connectModal.style.display = 'none';
+
+    // Silent background connect to local host
+    const defaultHost = window.location.host || 'localhost:3000';
+    network.connect(defaultHost, name, selectedTeam).catch(e => {
+      console.log('Playing in offline/local bot mode.');
+    });
+
+    initGame(name, selectedTeam);
+
+    // Request pointer lock for FPS camera
+    if (canvas) {
+      setTimeout(() => {
+        try { canvas.requestPointerLock(); } catch (err) {}
+      }, 100);
+    }
+  }
+
+  // Expose globally as safe fallback
+  window.startInstantGame = startPlayNow;
+
+  // 1. INSTANT START (WITH BOTS) - Click listener
   if (quickPlayBtn) {
-    quickPlayBtn.addEventListener('click', () => {
-      const name = playerNameInput.value.trim() || 'CS_Player';
-      connectModal.style.display = 'none';
-
-      // Silent network connect in background if server is online
-      const defaultHost = window.location.host || 'localhost:3000';
-      network.connect(defaultHost, name, selectedTeam).catch(e => {
-        console.log('Playing in offline/local bot mode.');
-      });
-
-      initGame(name, selectedTeam);
+    quickPlayBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      startPlayNow();
     });
   }
 
@@ -240,4 +256,10 @@ window.addEventListener('DOMContentLoaded', () => {
       if (pingElem) pingElem.innerText = ping;
     });
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
