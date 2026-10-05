@@ -1,0 +1,679 @@
+/* Counter-Strike 1.6 Authentic UI Theme */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@600;700&display=swap');
+
+:root {
+  --cs-green: #90ee90;
+  --cs-amber: #ffbc00;
+  --cs-red: #ff3333;
+  --cs-blue: #4da6ff;
+  --cs-bg-translucent: rgba(20, 24, 20, 0.82);
+  --cs-border: #445544;
+  --cs-panel: #2b332b;
+  --hud-color: #ffd000;
+  --hud-glow: rgba(255, 208, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0b0c0b;
+  font-family: 'Share Tech Mono', monospace;
+  color: #fff;
+}
+
+#game-canvas {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
+/* Crosshair */
+#crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 50;
+  display: block;
+}
+
+.ch-line {
+  position: absolute;
+  background-color: var(--cs-green);
+  box-shadow: 0 0 2px #000;
+}
+
+.ch-top { width: 2px; height: 10px; top: -14px; left: -1px; }
+.ch-bottom { width: 2px; height: 10px; top: 4px; left: -1px; }
+.ch-left { width: 10px; height: 2px; left: -14px; top: -1px; }
+.ch-right { width: 10px; height: 2px; left: 4px; top: -1px; }
+.ch-dot { width: 2px; height: 2px; left: -1px; top: -1px; display: none; }
+
+/* Sniper Scope Overlay */
+#sniper-scope {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 45;
+  display: none;
+  background: radial-gradient(circle at center, transparent 38%, black 41%, black 100%);
+}
+
+#sniper-scope::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+#sniper-scope::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Flashbang Blind Overlay */
+#flash-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 90;
+  transition: opacity 0.1s ease-out;
+}
+
+/* Damage Indicator */
+#damage-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+  transition: opacity 0.15s ease-out;
+}
+
+/* Radar (Top Left) */
+#radar-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(10, 25, 10, 0.7);
+  border: 2px solid #336633;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+  z-index: 30;
+  overflow: hidden;
+}
+
+#radar-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Top Round Info & Timer */
+#top-hud {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(15, 20, 15, 0.75);
+  border: 1px solid #3a4a3a;
+  padding: 6px 24px;
+  border-radius: 6px;
+  z-index: 30;
+  font-family: 'Teko', sans-serif;
+  letter-spacing: 1px;
+}
+
+.team-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 28px;
+}
+
+.team-score.t { color: #de882b; }
+.team-score.ct { color: #58a0e8; }
+
+#round-clock {
+  font-size: 36px;
+  color: var(--hud-color);
+  min-width: 70px;
+  text-align: center;
+  text-shadow: 0 0 6px var(--hud-glow);
+}
+
+#c4-timer-display {
+  display: none;
+  font-size: 32px;
+  color: #ff2222;
+  font-weight: bold;
+  animation: blink 0.6s infinite alternate;
+}
+
+@keyframes blink {
+  from { opacity: 1; }
+  to { opacity: 0.3; }
+}
+
+/* Killfeed (Top Right) */
+#killfeed {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.kill-item {
+  background: rgba(10, 15, 10, 0.7);
+  border-left: 3px solid #ff4444;
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.kill-killer.t, .kill-victim.t { color: #e5973b; font-weight: bold; }
+.kill-killer.ct, .kill-victim.ct { color: #6db1ff; font-weight: bold; }
+.kill-weapon { color: #ffbc00; font-size: 12px; font-weight: bold; }
+.kill-headshot { color: #ff3333; font-weight: bold; font-size: 13px; }
+
+/* Bottom HUD (Health, Armor, Money, Ammo) - CS 1.6 Authentic Yellow Glow */
+#bottom-hud {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 30;
+  font-family: 'Teko', sans-serif;
+  letter-spacing: 1px;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.hud-box {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--hud-color);
+  text-shadow: 0 0 8px var(--hud-glow);
+}
+
+.hud-icon {
+  font-size: 24px;
+  opacity: 0.85;
+}
+
+.hud-value {
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+#hud-money {
+  color: #4cd964;
+  text-shadow: 0 0 8px rgba(76, 217, 100, 0.5);
+  font-size: 38px;
+}
+
+#hud-ammo {
+  font-size: 46px;
+}
+
+#hud-c4-indicator {
+  display: none;
+  color: #ff3b30;
+  font-size: 28px;
+  align-items: center;
+  gap: 6px;
+  animation: pulse 1s infinite alternate;
+}
+
+/* Plant / Defuse Progress Bar */
+#action-progress {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  display: none;
+  text-align: center;
+  z-index: 35;
+}
+
+#action-label {
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: var(--cs-amber);
+  text-shadow: 0 0 4px #000;
+}
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--cs-amber);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#progress-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--cs-amber);
+  box-shadow: 0 0 8px var(--cs-amber);
+  transition: width 0.05s linear;
+}
+
+/* Center Announcement Banner */
+#announcement-banner {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Teko', sans-serif;
+  font-size: 52px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  color: #ffd000;
+  text-shadow: 0 0 16px rgba(255, 208, 0, 0.8), 2px 2px 0px #000;
+  z-index: 40;
+  display: none;
+  animation: bannerPop 0.3s ease-out;
+}
+
+@keyframes bannerPop {
+  0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Modals & Overlays */
+.overlay-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 15, 12, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.cs-window {
+  background: #232c23;
+  border: 2px solid #556b55;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  min-width: 480px;
+  max-width: 90vw;
+  overflow: hidden;
+}
+
+.cs-window-header {
+  background: linear-gradient(90deg, #374737, #243024);
+  padding: 8px 16px;
+  border-bottom: 2px solid #4a5c4a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cs-window-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--cs-amber);
+  letter-spacing: 1px;
+}
+
+.cs-window-body {
+  padding: 20px;
+}
+
+/* Buy Menu (CS 1.6 Authentic Grid) */
+#buy-menu {
+  display: none;
+}
+
+.buy-columns {
+  display: grid;
+  grid-template-columns: 200px 320px;
+  gap: 16px;
+}
+
+.category-list, .item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cs-btn {
+  background: #2f3c2f;
+  border: 1px solid #4a5e4a;
+  color: #d8e5d8;
+  padding: 8px 14px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 2px;
+  transition: all 0.15s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cs-btn:hover:not(:disabled) {
+  background: #475d47;
+  border-color: var(--cs-amber);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(255, 188, 0, 0.4);
+}
+
+.cs-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #333;
+}
+
+.cs-btn .item-price {
+  color: #62d862;
+  font-weight: bold;
+}
+
+/* Team Selection Modal */
+#team-modal {
+  display: none;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.team-card {
+  background: rgba(30, 40, 30, 0.85);
+  border: 2px solid #495e49;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.team-card:hover {
+  transform: translateY(-4px);
+}
+
+.team-card.t:hover {
+  border-color: #e5973b;
+  box-shadow: 0 0 15px rgba(229, 151, 59, 0.35);
+}
+
+.team-card.ct:hover {
+  border-color: #58a0e8;
+  box-shadow: 0 0 15px rgba(88, 160, 232, 0.35);
+}
+
+.team-title {
+  font-family: 'Teko', sans-serif;
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.team-card.t .team-title { color: #e5973b; }
+.team-card.ct .team-title { color: #58a0e8; }
+
+.team-desc {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+
+/* Scoreboard (TAB) */
+#scoreboard {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(16, 22, 16, 0.92);
+  border: 2px solid #445944;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+  padding: 16px;
+  border-radius: 4px;
+  z-index: 80;
+  width: 760px;
+  max-width: 95vw;
+}
+
+.sb-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #3d4f3d;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: var(--cs-amber);
+}
+
+.sb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.sb-table th {
+  text-align: left;
+  padding: 6px 10px;
+  color: #8fa68f;
+  border-bottom: 1px solid #2e3d2e;
+}
+
+.sb-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #1c261c;
+}
+
+.sb-team-title {
+  background: #253325;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.sb-team-title.t { color: #e5973b; }
+.sb-team-title.ct { color: #58a0e8; }
+
+/* In-Game Chat */
+#chat-container {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 30;
+  pointer-events: none;
+}
+
+#chat-log {
+  max-height: 180px;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-msg {
+  background: rgba(10, 15, 10, 0.6);
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
+.chat-sender.t { color: #de882b; font-weight: bold; }
+.chat-sender.ct { color: #58a0e8; font-weight: bold; }
+
+#chat-input-box {
+  display: none;
+  pointer-events: auto;
+  margin-top: 4px;
+}
+
+#chat-input {
+  width: 100%;
+  background: rgba(15, 20, 15, 0.9);
+  border: 1px solid var(--cs-amber);
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 2px;
+  outline: none;
+}
+
+/* Start Menu & Direct IP Connect */
+#connect-modal {
+  display: flex;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #a0b8a0;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  background: #192219;
+  border: 1px solid #445944;
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 2px;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--cs-amber);
+  box-shadow: 0 0 6px rgba(255, 188, 0, 0.3);
+}
+
+.cs-btn-primary {
+  background: #3e5e3e;
+  border: 1px solid #629662;
+  color: #fff;
+  font-weight: bold;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+  width: 100%;
+  text-align: center;
+}
+
+.cs-btn-primary:hover {
+  background: #527c52;
+  border-color: #8ed68e;
+  box-shadow: 0 0 10px rgba(100, 200, 100, 0.4);
+}
+
+.connect-status {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #aaa;
+  text-align: center;
+}
+
+/* Help & Controls Hint */
+#controls-hint {
+  position: absolute;
+  top: 20px;
+  left: 200px;
+  background: rgba(15, 20, 15, 0.7);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #9cb39c;
+  pointer-events: none;
+  z-index: 30;
+  border: 1px solid #334433;
+}
+
+/* FPS Counter */
+#fps-counter {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 13px;
+  color: #4cd964;
+  z-index: 30;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 3px;
+}

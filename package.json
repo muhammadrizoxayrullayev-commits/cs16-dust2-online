@@ -1,0 +1,19 @@
+{
+  "name": "oyin-web",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "start:daemon": "./start-24-7.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1",
+    "three": "^0.186.1",
+    "ws": "^8.22.0"
+  }
+}

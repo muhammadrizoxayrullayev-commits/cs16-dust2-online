@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Counter-Strike 1.6 Dust II Online | Web FPS 3D</title>
+  <meta name="description" content="Play authentic Counter-Strike 1.6 Dust II directly in your web browser. 3D high FPS graphics, multiplayer via IP address, bots, buy menu, and classic sounds.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 3D Render Canvas -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- FPS & Ping Indicator -->
+  <div id="fps-counter">-- FPS | Ping: --ms</div>
+
+  <!-- In-Game Controls Hint -->
+  <div id="controls-hint">
+    [WASD] Move &bull; [SPACE] Jump &bull; [CTRL] Crouch &bull; [B] Buy Menu &bull; [R] Reload &bull; [TAB] Scores &bull; [E] Defuse/Plant
+  </div>
+
+  <!-- CS 1.6 Dynamic Crosshair -->
+  <div id="crosshair">
+    <div class="ch-line ch-top"></div>
+    <div class="ch-line ch-bottom"></div>
+    <div class="ch-line ch-left"></div>
+    <div class="ch-line ch-right"></div>
+    <div class="ch-dot"></div>
+  </div>
+
+  <!-- AWP Sniper Scope Overlay -->
+  <div id="sniper-scope"></div>
+
+  <!-- Flashbang Blind Overlay -->
+  <div id="flash-overlay"></div>
+
+  <!-- Damage Vignette Overlay -->
+  <div id="damage-overlay"></div>
+
+  <!-- Radar (Top Left) -->
+  <div id="radar-container">
+    <canvas id="radar-canvas" width="160" height="160"></canvas>
+  </div>
+
+  <!-- Top Round Scoreboard & Clock -->
+  <div id="top-hud">
+    <div class="team-score t">
+      <span class="team-name">T</span>
+      <span id="score-t">0</span>
+    </div>
+    <div id="round-clock">1:55</div>
+    <div id="c4-timer-display">C4: 45s</div>
+    <div class="team-score ct">
+      <span id="score-ct">0</span>
+      <span class="team-name">CT</span>
+    </div>
+  </div>
+
+  <!-- Killfeed (Top Right) -->
+  <div id="killfeed"></div>
+
+  <!-- Center Announcement Banner (e.g. Terrorists Win!) -->
+  <div id="announcement-banner">TERRORISTS WIN!</div>
+
+  <!-- Plant / Defuse Progress Bar -->
+  <div id="action-progress">
+    <div id="action-label">PLANTING BOMB...</div>
+    <div class="progress-track">
+      <div id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Bottom HUD (CS 1.6 Golden Yellow HUD) -->
+  <div id="bottom-hud">
+    <!-- Left: Health & Armor -->
+    <div class="hud-group">
+      <div class="hud-box">
+        <span class="hud-icon">+</span>
+        <span class="hud-value" id="hud-hp-val">100</span>
+      </div>
+      <div class="hud-box">
+        <span class="hud-icon">&#9632;</span>
+        <span class="hud-value" id="hud-armor-val">100</span>
+      </div>
+    </div>
+
+    <!-- Center: Money -->
+    <div class="hud-group">
+      <div class="hud-box" id="hud-money">
+        <span class="hud-icon">$</span>
+        <span class="hud-value" id="hud-money-val">800</span>
+      </div>
+    </div>
+
+    <!-- Right: Weapon & Ammo -->
+    <div class="hud-group">
+      <div class="hud-box">
+        <span class="hud-icon" id="hud-weapon-name">AK-47</span>
+      </div>
+      <div class="hud-box" id="hud-ammo">
+        <span class="hud-value" id="hud-ammo-val">30</span>
+        <span style="font-size: 26px; opacity: 0.6;">/</span>
+        <span class="hud-value" style="font-size: 28px; opacity: 0.8;" id="hud-reserve-val">90</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- In-Game Chat -->
+  <div id="chat-container">
+    <div id="chat-log"></div>
+    <div id="chat-input-box">
+      <input type="text" id="chat-input" placeholder="Press Enter to send chat..." maxlength="120" autocomplete="off">
+    </div>
+  </div>
+
+  <!-- Buy Menu Modal (Press B) -->
+  <div id="buy-menu" class="overlay-modal">
+    <div class="cs-window">
+      <div class="cs-window-header">
+        <span class="cs-window-title">BUY MENU [CS 1.6 ARSENAL]</span>
+        <button id="buy-close-btn" class="cs-btn" style="padding: 2px 8px;">X</button>
+      </div>
+      <div class="cs-window-body">
+        <div class="buy-columns">
+          <div class="category-list">
+            <button class="cs-btn cat-btn" data-category="pistols">1. Pistols</button>
+            <button class="cs-btn cat-btn" data-category="shotguns">2. Shotguns</button>
+            <button class="cs-btn cat-btn" data-category="smgs">3. Sub-Machine Guns</button>
+            <button class="cs-btn cat-btn" data-category="rifles">4. Rifles</button>
+            <button class="cs-btn cat-btn" data-category="equipment">5. Equipment</button>
+          </div>
+          <div class="item-list" id="buy-items-list">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scoreboard (Hold TAB) -->
+  <div id="scoreboard">
+    <div class="sb-header">
+      <span>COUNTER-STRIKE 1.6 &bull; DE_DUST2</span>
+      <span>SERVER: ONLINE</span>
+    </div>
+    <table class="sb-table">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Kills</th>
+          <th>Deaths</th>
+          <th>Ping</th>
+        </tr>
+      </thead>
+      <tbody id="sb-body">
+        <tr class="sb-team-title t"><td colspan="4">TERRORISTS</td></tr>
+        <tr><td>[You] Player</td><td>0</td><td>0</td><td id="hud-ping-val">15</td></tr>
+        <tr><td>[BOT] Yuriy</td><td>0</td><td>0</td><td>5</td></tr>
+        <tr><td>[BOT] Alex</td><td>0</td><td>0</td><td>5</td></tr>
+        <tr class="sb-team-title ct"><td colspan="4">COUNTER-TERRORISTS</td></tr>
+        <tr><td>[BOT] Spetsnaz</td><td>0</td><td>0</td><td>5</td></tr>
+        <tr><td>[BOT] Viper</td><td>0</td><td>0</td><td>5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Direct IP Connection & Welcome Modal -->
+  <div id="connect-modal" class="overlay-modal">
+    <div class="cs-window" style="width: 540px;">
+      <div class="cs-window-header">
+        <span class="cs-window-title">COUNTER-STRIKE 1.6 - DUST II ONLINE</span>
+      </div>
+      <div class="cs-window-body">
+        <div class="form-group">
+          <label for="server-ip-input">Multiplayer Server Address / IP (Share with friends):</label>
+          <input type="text" id="server-ip-input" class="form-input" placeholder="e.g. 192.168.1.15:3000 or localhost:3000">
+          <small style="color: #889988; font-size: 11px; margin-top: 4px; display: block;">
+            Leave default for local/current host, or enter your friend's IP:Port to join their match!
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="player-name-input">Your Nickname:</label>
+          <input type="text" id="player-name-input" class="form-input" value="CS_Player" maxlength="16">
+        </div>
+
+        <label style="color: #a0b8a0; font-size: 14px;">Select Your Team:</label>
+        <div class="team-grid">
+          <div class="team-card t" data-team="T" style="border-color: #e5973b;">
+            <div class="team-title">TERRORISTS</div>
+            <div class="team-desc">Phoenix Connexion / AK-47 &amp; C4</div>
+            <button class="cs-btn" style="width: 100%; justify-content: center; pointer-events: none;">Select T</button>
+          </div>
+          <div class="team-card ct" data-team="CT">
+            <div class="team-title">COUNTER-TERRORISTS</div>
+            <div class="team-desc">Seal Team 6 / M4A1 &amp; Defuser</div>
+            <button class="cs-btn" style="width: 100%; justify-content: center; pointer-events: none;">Select CT</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <button id="join-btn" class="cs-btn-primary">JOIN MATCH (DE_DUST2)</button>
+          <div id="connect-status" class="connect-status">Ready to connect...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

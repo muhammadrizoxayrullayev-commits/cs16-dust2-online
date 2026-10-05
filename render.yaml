@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: cs16-dust2-online
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    autoDeploy: true
