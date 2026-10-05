@@ -53,11 +53,19 @@ Ushbu loyiha afsonaviy **Counter-Strike 1.6** o'yinining to'liq veb-versiyasi bo
      - Bomba qo'yilgan bo'lsa (T lar yutqazsa ham): har bir Terroristga **+$800** bonus.
      - Maksimal pul: **$16,000**.
 
-5. **IP Manzil orqali Ko'p Foydalanuvchili (Multiplayer)**:
-   - Do'stingiz bilan birgalikda o'ynash uchun IP manzilni kiritib to'g'ridan-to'g'ri ulanasiz (masalan: `192.168.1.15:3000` yoki internetdagi hosting domeni).
-   - Bir o'zingiz o'ynasangiz, avtomatik ravishda **aqlli Botlar** (T va CT) xaritada harakatlanadi, otishadi va bomba bilan ishlaydi.
+5. **Tezkor O'yin (Instant Play with Bots)**:
+   - Hech qanday IP kiritish majburiyati yo'q! Kirishingiz bilan **▶ PLAY NOW (INSTANT WITH BOTS)** tugmasini bosasiz va darhol xaritada aqlli botlar bilan o'yin boshlanadi.
 
-6. **24/7 Uzluksiz Ishlash**:
+6. **CS 1.6 Dasturchilar Konsoli (Developer Console `~`)**:
+   - Klaviaturada **`~`** (Tilda / Backquote) tugmasini yoki ekrandagi **`[~] CONSOLE`** tugmasini bosib konsolni ochishingiz mumkin.
+   - **`status`**: Serverning barcha ma'lumotlari va ulanish uchun tayyor IP manzillarini ko'rsatadi (masalan: `connect 172.20.10.2:3000`).
+   - **`connect <ip:port>`**: Boshqa o'yinchi / do'stingizning serveriga IP orqali to'g'ridan-to'g'ri ulanish (masalan: `connect 192.168.1.15:3000`).
+   - **`add_bot [soni]`**: Kerakli miqdordagi botlarni qo'shish (masalan: `add_bot 4` bir vaqtning o'zida 4 ta bot qo'shadi).
+   - **`kick_bot`**: Barcha botlarni serverdan chiqarib yuborish.
+   - **`restart`**: Raundni qaytadan boshlash (`sv_restart 1`).
+   - **`help`**: Barcha buyruqlar ro'yxatini chiqarish.
+
+7. **24/7 Uzluksiz Ishlash**:
    - `start-24-7.sh` skripti serverni fonda ishga tushiradi va server qulasa avtomatik 2 soniyada qayta ko'taradi.
    - `docker-compose up -d` orqali Docker konteynerida butun umr 24/7 ishlash kafolati.
    - Render.com yoki har qanday VPS da `render.yaml` orqali bepul 24/7 hosting.

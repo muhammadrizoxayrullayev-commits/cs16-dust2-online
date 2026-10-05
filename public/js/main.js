@@ -1,11 +1,13 @@
 import { NetworkClient } from './network.js';
 import { GameEngine } from './game.js';
 import { CS_WEAPONS } from './economy.js';
+import { CSConsole } from './console.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game-canvas');
   const network = new NetworkClient();
   let game = null;
+  let csConsole = null;
 
   // FPS Counter tracking
   let lastFpsTime = performance.now();
@@ -16,6 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const connectModal = document.getElementById('connect-modal');
   const serverIpInput = document.getElementById('server-ip-input');
   const playerNameInput = document.getElementById('player-name-input');
+  const quickPlayBtn = document.getElementById('quick-play-btn');
   const joinBtn = document.getElementById('join-btn');
   const connectStatus = document.getElementById('connect-status');
 
@@ -35,40 +38,55 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Connect & Start Game
-  joinBtn.addEventListener('click', async () => {
-    const targetIp = serverIpInput.value.trim();
-    const name = playerNameInput.value.trim() || 'CS_Player';
+  // 1. INSTANT START (WITH BOTS) - No waiting, no blocking!
+  if (quickPlayBtn) {
+    quickPlayBtn.addEventListener('click', () => {
+      const name = playerNameInput.value.trim() || 'CS_Player';
+      connectModal.style.display = 'none';
 
-    connectStatus.innerText = 'Connecting to ' + targetIp + '...';
-    connectStatus.style.color = '#ffbc00';
+      // Silent network connect in background if server is online
+      const defaultHost = window.location.host || 'localhost:3000';
+      network.connect(defaultHost, name, selectedTeam).catch(e => {
+        console.log('Playing in offline/local bot mode.');
+      });
 
-    try {
-      await network.connect(targetIp, name, selectedTeam);
-      connectStatus.innerText = 'Connected!';
-      connectStatus.style.color = '#4cd964';
+      initGame(name, selectedTeam);
+    });
+  }
 
-      setTimeout(() => {
-        connectModal.style.display = 'none';
-        initGame(name, selectedTeam);
-      }, 400);
-    } catch (err) {
-      console.warn('Network connection failed, launching in standalone/bot mode', err);
-      connectStatus.innerText = 'Server offline, launching with Bots!';
-      connectStatus.style.color = '#ff9900';
+  // 2. CONNECT TO SPECIFIC IP (From Menu)
+  if (joinBtn) {
+    joinBtn.addEventListener('click', async () => {
+      const targetIp = serverIpInput.value.trim() || window.location.host;
+      const name = playerNameInput.value.trim() || 'CS_Player';
 
-      setTimeout(() => {
-        connectModal.style.display = 'none';
-        initGame(name, selectedTeam);
-      }, 800);
-    }
-  });
+      connectStatus.innerText = 'Connecting to ' + targetIp + '...';
+      connectStatus.style.color = '#ffbc00';
+
+      try {
+        await network.connect(targetIp, name, selectedTeam);
+        connectStatus.innerText = 'Connected!';
+        connectStatus.style.color = '#4cd964';
+      } catch (err) {
+        console.warn('Network connection notice:', err);
+      }
+
+      connectModal.style.display = 'none';
+      initGame(name, selectedTeam);
+    });
+  }
 
   function initGame(name, team) {
+    if (game) return; // Prevent duplicate init
+
     game = new GameEngine(canvas, network);
     game.player.name = name;
     game.player.team = team;
     game.respawnPlayer();
+
+    // Initialize Developer Console [~]
+    csConsole = new CSConsole(game, network);
+    game.csConsole = csConsole;
 
     setupBuyMenu();
     setupChat();

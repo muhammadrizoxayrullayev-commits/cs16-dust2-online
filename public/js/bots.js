@@ -28,6 +28,12 @@ const ROUTES = {
   CT_MID_PATROL: ['ct_spawn', 'mid_doors', 'catwalk']
 };
 
+const CS_BOT_NAMES = [
+  'Yuriy', 'Alex', 'Spetsnaz', 'Viper', 'Razor', 'Wolf',
+  'Boris', 'Rex', 'Titan', 'Ghost', 'Hawk', 'Falcon',
+  'Cobra', 'Hammer', 'Phantom', 'Grizzly'
+];
+
 export class Bot {
   constructor(id, name, team, scene) {
     this.id = id;
@@ -147,3 +153,68 @@ export class Bot {
     this.scene.remove(this.character.group);
   }
 }
+
+export class BotManager {
+  constructor(scene) {
+    this.scene = scene;
+    this.bots = [];
+    this.nextId = 1;
+  }
+
+  addBot(team = null, name = null) {
+    // If team is null, auto-balance
+    if (!team) {
+      let tCount = 0;
+      let ctCount = 0;
+      this.bots.forEach(b => {
+        if (b.team === 'T') tCount++;
+        else ctCount++;
+      });
+      team = tCount <= ctCount ? 'T' : 'CT';
+    }
+
+    if (!name) {
+      const availableNames = CS_BOT_NAMES.filter(n => !this.bots.some(b => b.name === n));
+      name = availableNames.length > 0
+        ? availableNames[Math.floor(Math.random() * availableNames.length)]
+        : 'Bot_' + this.nextId;
+    }
+
+    const bot = new Bot('bot_' + (this.nextId++), name, team, this.scene);
+    this.bots.push(bot);
+    return bot;
+  }
+
+  addBots(count = 1) {
+    const added = [];
+    for (let i = 0; i < count; i++) {
+      added.push(this.addBot());
+    }
+    return added;
+  }
+
+  kickAll() {
+    const count = this.bots.length;
+    this.bots.forEach(b => b.destroy());
+    this.bots = [];
+    return count;
+  }
+
+  kickOne() {
+    if (this.bots.length === 0) return null;
+    const bot = this.bots.pop();
+    bot.destroy();
+    return bot;
+  }
+
+  respawnAll() {
+    this.bots.forEach(b => b.respawn());
+  }
+
+  update(delta, playerPos, playerTeam, isPlayerAlive, onBotShoot) {
+    for (const bot of this.bots) {
+      bot.update(delta, playerPos, playerTeam, isPlayerAlive, onBotShoot);
+    }
+  }
+}
+

@@ -39,6 +39,11 @@ export class NetworkClient {
         }
       }
 
+      if (this.ws) {
+        try { this.ws.close(); } catch (e) {}
+        this.ws = null;
+      }
+
       this.serverIp = targetIp || window.location.host;
 
       try {
@@ -79,9 +84,28 @@ export class NetworkClient {
     });
   }
 
+  async getServerInfo() {
+    try {
+      const res = await fetch('/api/server-info');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.warn('Could not fetch server-info', e);
+    }
+    return {
+      hostname: 'CS 1.6 Dust II Dedicated Server',
+      localIps: this.serverIps || [],
+      port: 3000,
+      playersCount: 1,
+      round: 1
+    };
+  }
+
   startPingLoop() {
-    setInterval(() => {
-      if (this.isConnected && this.ws.readyState === WebSocket.OPEN) {
+    if (this.pingInterval) clearInterval(this.pingInterval);
+    this.pingInterval = setInterval(() => {
+      if (this.isConnected && this.ws && this.ws.readyState === WebSocket.OPEN) {
         this.lastPingSent = performance.now();
         this.send({ type: 'ping', time: this.lastPingSent });
       }
@@ -92,6 +116,8 @@ export class NetworkClient {
     switch (msg.type) {
       case 'welcome':
         this.playerId = msg.playerId;
+        this.serverIps = msg.serverIps || [];
+        this.serverPort = msg.port || 3000;
         this.trigger('welcome', msg);
         break;
 

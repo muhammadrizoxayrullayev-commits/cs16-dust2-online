@@ -4,7 +4,7 @@ import { WeaponManager } from './weapons.js';
 import { CharacterModel } from './characters.js';
 import { EconomyManager, CS_WEAPONS } from './economy.js';
 import { soundEngine } from './audio.js';
-import { Bot } from './bots.js';
+import { BotManager } from './bots.js';
 
 export class GameEngine {
   constructor(canvas, network) {
@@ -75,7 +75,7 @@ export class GameEngine {
 
     // Remote Players & Bots
     this.remotePlayers = {}; // id -> { data, model }
-    this.bots = [];
+    this.botManager = new BotManager(this.scene);
 
     // Particles & FX
     this.bulletTracerGroup = new THREE.Group();
@@ -208,19 +208,13 @@ export class GameEngine {
     this.camera.rotation.x = this.pitch + this.weaponManager.recoilPitch;
   }
 
-  initBots() {
-    // 4 Bots for 5v5 action
-    const botConfigs = [
-      { name: 'Yuriy', team: 'T' },
-      { name: 'Alex', team: 'T' },
-      { name: 'Spetsnaz', team: 'CT' },
-      { name: 'Viper', team: 'CT' }
-    ];
+  get bots() {
+    return this.botManager.bots;
+  }
 
-    botConfigs.forEach((cfg, idx) => {
-      const bot = new Bot('bot_' + idx, cfg.name, cfg.team, this.scene);
-      this.bots.push(bot);
-    });
+  initBots() {
+    // Spawn 4 bots initially (2 T, 2 CT) for instant action
+    this.botManager.addBots(4);
   }
 
   setupNetworkHandlers() {
@@ -732,21 +726,19 @@ export class GameEngine {
     }
 
     // Update bots
-    for (const bot of this.bots) {
-      bot.update(
-        delta,
-        this.camera.position,
-        this.player.team,
-        this.player.isAlive,
-        (b, target) => {
-          // Bot shoot callback
-          this.createBulletTracer(b.character.group.position, target.clone().sub(b.character.group.position).normalize());
-          if (b.team !== this.player.team && Math.random() < 0.28) {
-            this.takeDamage(20);
-          }
+    this.botManager.update(
+      delta,
+      this.camera.position,
+      this.player.team,
+      this.player.isAlive,
+      (b, target) => {
+        // Bot shoot callback
+        this.createBulletTracer(b.character.group.position, target.clone().sub(b.character.group.position).normalize());
+        if (b.team !== this.player.team && Math.random() < 0.28) {
+          this.takeDamage(20);
         }
-      );
-    }
+      }
+    );
 
     this.updateRadar();
     this.renderer.render(this.scene, this.camera);

@@ -14,9 +14,12 @@
   <!-- FPS & Ping Indicator -->
   <div id="fps-counter">-- FPS | Ping: --ms</div>
 
+  <!-- HUD Console Button -->
+  <button id="hud-console-btn">[~] CONSOLE</button>
+
   <!-- In-Game Controls Hint -->
   <div id="controls-hint">
-    [WASD] Move &bull; [SPACE] Jump &bull; [CTRL] Crouch &bull; [B] Buy Menu &bull; [R] Reload &bull; [TAB] Scores &bull; [E] Defuse/Plant
+    [WASD] Move &bull; [SPACE] Jump &bull; [CTRL] Crouch &bull; [B] Buy Menu &bull; [R] Reload &bull; [~] Console &bull; [TAB] Scores
   </div>
 
   <!-- CS 1.6 Dynamic Crosshair -->
@@ -164,23 +167,31 @@
     </table>
   </div>
 
-  <!-- Direct IP Connection & Welcome Modal -->
+  <!-- Counter-Strike 1.6 Developer Console [~] -->
+  <div id="cs-console">
+    <div class="console-header">
+      <span>COUNTER-STRIKE 1.6 DEVELOPER CONSOLE [~]</span>
+      <button id="console-close-btn" class="cs-btn" style="padding: 2px 8px;">X</button>
+    </div>
+    <div id="console-log">
+      <!-- Populated via console.js -->
+    </div>
+    <div class="console-footer">
+      <input type="text" id="console-input" placeholder="Type command: status, add_bot 4, kick_bot, connect <ip>..." autocomplete="off">
+      <button id="console-submit-btn" class="cs-btn" style="padding: 6px 16px;">SUBMIT</button>
+    </div>
+  </div>
+
+  <!-- Main Menu / Instant Start & Connection Modal -->
   <div id="connect-modal" class="overlay-modal">
-    <div class="cs-window" style="width: 540px;">
+    <div class="cs-window" style="width: 560px;">
       <div class="cs-window-header">
         <span class="cs-window-title">COUNTER-STRIKE 1.6 - DUST II ONLINE</span>
       </div>
       <div class="cs-window-body">
+        <!-- Nickname & Team -->
         <div class="form-group">
-          <label for="server-ip-input">Multiplayer Server Address / IP (Share with friends):</label>
-          <input type="text" id="server-ip-input" class="form-input" placeholder="e.g. 192.168.1.15:3000 or localhost:3000">
-          <small style="color: #889988; font-size: 11px; margin-top: 4px; display: block;">
-            Leave default for local/current host, or enter your friend's IP:Port to join their match!
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="player-name-input">Your Nickname:</label>
+          <label for="player-name-input">Player Nickname:</label>
           <input type="text" id="player-name-input" class="form-input" value="CS_Player" maxlength="16">
         </div>
 
@@ -198,9 +209,27 @@
           </div>
         </div>
 
-        <div style="margin-top: 20px;">
-          <button id="join-btn" class="cs-btn-primary">JOIN MATCH (DE_DUST2)</button>
-          <div id="connect-status" class="connect-status">Ready to connect...</div>
+        <!-- Primary Action: PLAY NOW -->
+        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+          <button id="quick-play-btn" class="cs-btn-primary" style="font-size: 18px; padding: 12px; background: #3b7c3b;">
+            ▶ PLAY NOW (INSTANT WITH BOTS)
+          </button>
+        </div>
+
+        <!-- Optional: Connect to Remote Server -->
+        <div style="margin-top: 15px; border-top: 1px solid #3d4f3d; padding-top: 12px;">
+          <details style="color: #9cb39c; font-size: 13px;">
+            <summary style="cursor: pointer; color: #ffbc00; font-weight: bold;">
+              🌐 Multiplayer / Connect to Friend's IP Address
+            </summary>
+            <div style="margin-top: 10px;">
+              <input type="text" id="server-ip-input" class="form-input" placeholder="e.g. 192.168.1.15:3000">
+              <button id="join-btn" class="cs-btn" style="width: 100%; margin-top: 8px; justify-content: center;">
+                CONNECT TO SERVER IP
+              </button>
+            </div>
+          </details>
+          <div id="connect-status" class="connect-status" style="margin-top: 8px;">Ready! Click "PLAY NOW" to start immediately.</div>
         </div>
       </div>
     </div>

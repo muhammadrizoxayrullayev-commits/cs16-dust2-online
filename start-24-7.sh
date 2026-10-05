@@ -9,16 +9,14 @@ cd "$SCRIPT_DIR"
 LOG_FILE="$SCRIPT_DIR/server_24_7.log"
 PID_FILE="$SCRIPT_DIR/server.pid"
 
-# Stop existing process if running
+# Stop existing server.js processes if running
+pkill -9 -f "server.js" 2>/dev/null
 if [ -f "$PID_FILE" ]; then
     OLD_PID=$(cat "$PID_FILE")
-    if ps -p "$OLD_PID" > /dev/null 2>&1; then
-        echo "Stopping existing server PID $OLD_PID..."
-        kill "$OLD_PID" 2>/dev/null
-        sleep 1
-    fi
+    kill -9 "$OLD_PID" 2>/dev/null
     rm -f "$PID_FILE"
 fi
+sleep 1
 
 echo "Starting server in 24/7 background mode..."
 nohup bash -c "

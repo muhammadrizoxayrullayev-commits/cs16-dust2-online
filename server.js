@@ -13,31 +13,6 @@ const PORT = process.env.PORT || 3000;
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Health check endpoint for 24/7 uptime monitoring (UptimeRobot, Pingdom, etc.)
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'online',
-    uptime: process.uptime(),
-    timestamp: Date.now(),
-    playersCount: Object.keys(players).length,
-    round: gameState.roundNumber
-  });
-});
-
-// Helper to get local IP address
-function getLocalIpAddresses() {
-  const interfaces = os.networkInterfaces();
-  const addresses = [];
-  for (const name of Object.keys(interfaces)) {
-    for (const iface of interfaces[name]) {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        addresses.push(iface.address);
-      }
-    }
-  }
-  return addresses;
-}
-
 // Game State Management
 const gameState = {
   roundNumber: 1,
@@ -60,6 +35,54 @@ const gameState = {
 
 const players = {};
 let nextPlayerId = 1;
+
+// Helper to get local IP address
+function getLocalIpAddresses() {
+  const interfaces = os.networkInterfaces();
+  const addresses = [];
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        addresses.push(iface.address);
+      }
+    }
+  }
+  return addresses;
+}
+
+// Health check endpoint for 24/7 uptime monitoring (UptimeRobot, Pingdom, etc.)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'online',
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+    playersCount: Object.keys(players).length,
+    round: gameState.roundNumber
+  });
+});
+
+// Server info endpoint for CS 1.6 status console command
+app.get('/api/server-info', (req, res) => {
+  const localIps = getLocalIpAddresses();
+  res.json({
+    hostname: 'CS 1.6 Dust II Dedicated Server',
+    version: '1.6.0-web',
+    localIps: localIps,
+    port: PORT,
+    playersCount: Object.keys(players).length,
+    players: Object.values(players).map(p => ({
+      id: p.id,
+      name: p.name,
+      team: p.team,
+      kills: p.kills,
+      deaths: p.deaths,
+      ping: p.ping
+    })),
+    round: gameState.roundNumber,
+    roundState: gameState.roundState,
+    scores: { t: gameState.tScore, ct: gameState.ctScore }
+  });
+});
 
 // Spawn Points for Dust2 (x, y, z, yaw)
 const SPAWN_POINTS = {
@@ -310,7 +333,9 @@ wss.on('connection', (ws, req) => {
     type: 'welcome',
     playerId: playerId,
     gameState: gameState,
-    players: players
+    players: players,
+    serverIps: getLocalIpAddresses(),
+    port: PORT
   }));
 
   // Notify other players

@@ -677,3 +677,107 @@ body, html {
   padding: 2px 6px;
   border-radius: 3px;
 }
+
+/* Counter-Strike 1.6 Developer Console [~] */
+#cs-console {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 760px;
+  max-width: 95vw;
+  height: 480px;
+  max-height: 80vh;
+  background: rgba(16, 22, 16, 0.95);
+  border: 2px solid #5a755a;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+#cs-console .console-header {
+  background: linear-gradient(90deg, #374737, #243024);
+  padding: 6px 12px;
+  border-bottom: 2px solid #4a5c4a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--cs-amber);
+  font-size: 15px;
+  font-weight: bold;
+}
+
+#console-log {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #c0dbc0;
+  background: rgba(8, 12, 8, 0.7);
+}
+
+.console-line {
+  word-break: break-all;
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+.console-command { color: #ffffff; font-weight: bold; }
+.console-info { color: #8ec08e; }
+.console-success { color: #4cd964; font-weight: bold; }
+.console-warn { color: #ffd000; }
+.console-error { color: #ff4d4d; }
+
+#cs-console .console-footer {
+  display: flex;
+  background: #1c241c;
+  border-top: 1px solid #3c4c3c;
+  padding: 8px;
+  gap: 8px;
+}
+
+#console-input {
+  flex: 1;
+  background: #0d140d;
+  border: 1px solid #4a614a;
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 2px;
+  outline: none;
+}
+
+#console-input:focus {
+  border-color: var(--cs-amber);
+}
+
+#hud-console-btn {
+  position: absolute;
+  top: 10px;
+  left: 200px;
+  background: rgba(30, 45, 30, 0.85);
+  border: 1px solid #5a755a;
+  color: #ffbc00;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+  border-radius: 3px;
+  z-index: 30;
+  transition: all 0.15s;
+}
+
+#hud-console-btn:hover {
+  background: #475d47;
+  color: #fff;
+  border-color: #ffd000;
+}
+
